@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر المنتجات العصري</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            color: white;
+        }
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div style="margin-top: 20px; font-size: 18px;">جاري التحميل...</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="social-icons">
+                <a href="https://www.facebook.com/share/1JP8ehjeyg/" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/scorehunt_?igsh=MWx4b21iNWEycGpidQ==" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://wa.me/+213557062477" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+            <h1 class="store-title">الروتشوسي ديزاد</h1>
+            <p class="store-subtitle">اكتشف أحدث المنتجات بأفضل الأسعار</p>
+
+            <div class="search-container">
+                <input type="text" class="search-bar" id="searchInput" placeholder="ابحث عن المنتجات...">
+                <button class="search-btn" onclick="searchProducts()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid"></div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>لم يتم العثور على منتجات</h3>
+            <p>جرب البحث بكلمات مختلفة</p>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #667eea;">لوحة التحكم</h2>
+                <button onclick="adminLogout()" class="delete-btn" style="background: #e74c3c;">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="showAdminTab('products')">المنتجات</button>
+                <button class="admin-tab" onclick="showAdminTab('delivery')">أسعار التوصيل</button>
+                <button class="admin-tab" onclick="showAdminTab('orders')">الطلبات</button>
+            </div>
+
+            <div class="admin-content active" id="products-content">
+                <h3>إدارة المنتجات</h3>
+                <div class="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>اسم المنتج</label>
+                            <input type="text" id="productName" placeholder="اسم المنتج">
+                        </div>
+                        <div class="form-group">
+                            <label>السعر</label>
+                            <input type="number" id="productPrice" placeholder="السعر">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>الوصف</label>
+                        <input type="text" id="productDescription" placeholder="وصف المنتج">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>التقييم (1-5)</label>
+                            <input type="number" id="productRating" min="1" max="5" placeholder="التقييم">
+                        </div>
+                        <div class="form-group">
+                            <label>عدد الصور</label>
+                            <select id="imageCount" onchange="updateImageInputs()">
+                                <option value="1">صورة واحدة</option>
+                                <option value="2">صورتان</option>
+                                <option value="3">3 صور</option>
+                                <option value="4">4 صور</option>
+                                <option value="5">5 صور</option>
+                                <option value="6">6 صور</option>
+                                <option value="7">7 صور</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>روابط الصور</label>
+                        <div class="image-urls-container" id="imageUrlsContainer">
+                            <div class="image-url-group">
+                                <input type="url" class="image-url-input" placeholder="رابط الصورة 1">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addProduct()" class="submit-btn">إضافة المنتج</button>
+                </div>
+                <div id="adminProductsList"></div>
+            </div>
+
+            <div class="admin-content" id="delivery-content">
+                <h3>أسعار التوصيل</h3>
+                <div class="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الولاية</label>
+                            <select id="deliveryState"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>التوصيل للمنزل</label>
+                            <input type="number" id="homeDeliveryPrice" placeholder="سعر التوصيل للمنزل">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>التوصيل للمكتب</label>
+                        <input type="number" id="officeDeliveryPrice" placeholder="سعر التوصيل للمكتب">
+                    </div>
+                    <button onclick="updateDeliveryPrices()" class="submit-btn">تحديث أسعار التوصيل</button>
+                </div>
+            </div>
+
+            <div class="admin-content" id="orders-content">
+                <h3>الطلبات الواردة</h3>
+                <div class="orders-list" id="ordersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal product-details-modal" id="productDetailsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeProductDetails()">&times;</button>
+            <div class="product-details-header">
+                <div class="product-details-images">
+                    <div class="product-image-container" id="detailsImageContainer"></div>
+                </div>
+                <div class="product-details-info">
+                    <h2 id="detailsProductName"></h2>
+                    <div class="product-details-price" id="detailsProductPrice"></div>
+                    <div class="product-details-rating" id="detailsProductRating"></div>
+                    <div class="product-details-description" id="detailsProductDescription"></div>
+                    <button class="order-now-btn" id="detailsOrderBtn">
+                        <i class="fas fa-shopping-cart"></i> اطلب الآن
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeOrderModal()">&times;</button>
+            <h3>طلب المنتج</h3>
+            <div id="selectedProductInfo"></div>
+
+            <form id="orderForm">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="customerName" required placeholder="الاسم واللقب">
+                </div>
+
+                <div class="form-group">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" id="customerPhone" required placeholder="رقم الهاتف">
+                </div>
+
+                <div class="form-group">
+                    <label>الولاية</label>
+                    <select id="customerState" required onchange="updateDeliveryPrice()">
+                        <option value="">اختر الولاية</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>نوع التوصيل</label>
+                    <select id="deliveryType" required onchange="updateDeliveryPrice()">
+                        <option value="">اختر نوع التوصيل</option>
+                        <option value="home">التوصيل للمنزل</option>
+                        <option value="office">التوصيل للمكتب</option>
+                    </select>
+                    <div class="delivery-price" id="deliveryPriceDisplay"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">تأكيد الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="cloud-storage.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
