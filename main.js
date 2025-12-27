@@ -498,13 +498,16 @@ function displayOrders() {
 // ===================
 
 function toggleAdmin() {
-    const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+    const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true' || 
+                         localStorage.getItem('adminLoggedIn') === 'true';
     
     if (adminLoggedIn) {
         const panel = document.getElementById('adminPanel');
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         if (panel.style.display === 'block') {
             loadAdminData();
+            // التمرير إلى لوحة التحكم
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     } else {
         const password = prompt('كلمة المرور:');
@@ -513,6 +516,8 @@ function toggleAdmin() {
             const panel = document.getElementById('adminPanel');
             panel.style.display = 'block';
             loadAdminData();
+            // التمرير إلى لوحة التحكم
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else if (password !== null) {
             alert('كلمة مرور خاطئة!');
         }
@@ -522,6 +527,7 @@ function toggleAdmin() {
 function adminLogout() {
     if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
         sessionStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminLoggedIn');
         document.getElementById('adminPanel').style.display = 'none';
         alert('تم تسجيل الخروج بنجاح');
     }
@@ -613,13 +619,16 @@ function closeProductDetails() {
 // ===================
 
 document.addEventListener('DOMContentLoaded', async function() {
+    // تهيئة البيانات
     await initializeDeliveryPrices();
     await initializeProducts();
     await initializeOrders();
     updateImageInputs();
 
+    // معالج إرسال الطلب
     document.getElementById('orderForm').addEventListener('submit', submitOrder);
 
+    // معالج البحث
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -627,18 +636,40 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
+    // التحقق من معاملات URL لفتح لوحة التحكم
     const urlParams = new URLSearchParams(window.location.search);
-    const adminParam = window.location.hash === '#admin' || urlParams.get('admin') === 'true';
-    const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+    const adminParam = urlParams.get('admin') === 'true';
+    const loginSuccess = urlParams.get('loginSuccess') === 'true';
+    const autoLogin = urlParams.get('autoLogin') === 'true';
     
-    if (adminLoggedIn && adminParam) {
+    // التحقق من حالة تسجيل الدخول
+    const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true' || 
+                         localStorage.getItem('adminLoggedIn') === 'true';
+    
+    // إذا كان المدير مسجل دخول وجاء من صفحة الـ admin أو تم تسجيل الدخول للتو
+    if (adminLoggedIn && (adminParam || loginSuccess || autoLogin)) {
+        console.log('فتح لوحة التحكم...');
+        
+        // تأخير بسيط للتأكد من تحميل جميع العناصر
         setTimeout(() => {
             const panel = document.getElementById('adminPanel');
-            panel.style.display = 'block';
-            loadAdminData();
+            if (panel) {
+                panel.style.display = 'block';
+                loadAdminData();
+                
+                // التمرير إلى لوحة التحكم
+                setTimeout(() => {
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                console.log('✅ تم فتح لوحة التحكم بنجاح');
+            } else {
+                console.error('❌ لم يتم العثور على لوحة التحكم');
+            }
         }, 500);
     }
 
+    // إغلاق النوافذ المنبثقة عند النقر خارجها
     window.addEventListener('click', function(event) {
         const orderModal = document.getElementById('orderModal');
         const detailsModal = document.getElementById('productDetailsModal');
@@ -650,4 +681,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeProductDetails();
         }
     });
+    
+    console.log('✅ تم تحميل الموقع بنجاح');
 });
