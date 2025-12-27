@@ -51,7 +51,7 @@
             </div>
             <h1 class="store-title">الروتشوسي ديزاد</h1>
             <p class="store-subtitle">اكتشف أحدث المنتجات بأفضل الأسعار</p>
-
+            
             <div class="search-container">
                 <input type="text" class="search-bar" id="searchInput" placeholder="ابحث عن المنتجات...">
                 <button class="search-btn" onclick="searchProducts()">
@@ -59,6 +59,12 @@
                 </button>
             </div>
         </div>
+
+        <!-- زر لوحة التحكم (مخفي) -->
+        <button onclick="toggleAdmin()" style="position: fixed; bottom: 20px; left: 20px; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 15px 20px; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; display: flex; align-items: center; gap: 10px; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            <i class="fas fa-cog"></i>
+            <span>لوحة التحكم</span>
+        </button>
 
         <div class="products-grid" id="productsGrid"></div>
 
@@ -75,7 +81,7 @@
                     <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
                 </button>
             </div>
-
+            
             <div class="admin-tabs">
                 <button class="admin-tab active" onclick="showAdminTab('products')">المنتجات</button>
                 <button class="admin-tab" onclick="showAdminTab('delivery')">أسعار التوصيل</button>
@@ -183,25 +189,25 @@
             <button class="close-btn" onclick="closeOrderModal()">&times;</button>
             <h3>طلب المنتج</h3>
             <div id="selectedProductInfo"></div>
-
+            
             <form id="orderForm">
                 <div class="form-group">
                     <label>الاسم الكامل</label>
                     <input type="text" id="customerName" required placeholder="الاسم واللقب">
                 </div>
-
+                
                 <div class="form-group">
                     <label>رقم الهاتف</label>
                     <input type="tel" id="customerPhone" required placeholder="رقم الهاتف">
                 </div>
-
+                
                 <div class="form-group">
                     <label>الولاية</label>
                     <select id="customerState" required onchange="updateDeliveryPrice()">
                         <option value="">اختر الولاية</option>
                     </select>
                 </div>
-
+                
                 <div class="form-group">
                     <label>نوع التوصيل</label>
                     <select id="deliveryType" required onchange="updateDeliveryPrice()">
@@ -211,7 +217,7 @@
                     </select>
                     <div class="delivery-price" id="deliveryPriceDisplay"></div>
                 </div>
-
+                
                 <button type="submit" class="submit-btn">تأكيد الطلب</button>
             </form>
         </div>
