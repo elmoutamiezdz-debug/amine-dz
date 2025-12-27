@@ -473,7 +473,8 @@
                     }
                     
                     setTimeout(() => {
-                        window.location.href = 'index.html?admin=true&loginSuccess=true';
+                        // فتح الصفحة الرئيسية مع معامل admin
+                        window.location.href = 'index.html?admin=true&loginSuccess=true#admin-panel';
                     }, 1500);
                 } else {
                     showError('اسم المستخدم أو كلمة المرور غير صحيحة');
@@ -488,7 +489,7 @@
             if (isLoggedIn) {
                 showSuccess('أنت مسجل دخول مسبقاً. جاري التحويل...');
                 setTimeout(() => {
-                    window.location.href = 'index.html?admin=true&autoLogin=true';
+                    window.location.href = 'index.html?admin=true&autoLogin=true#admin-panel';
                 }, 1500);
             }
         });
